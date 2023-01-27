@@ -1,7 +1,36 @@
+import Cards from '@/components/card';
+import { runner } from '@/components/error';
+import ProtectedRoute from '@/components/protected';
+import { Button, Grid, Group, Stack, TextInput } from '@mantine/core';
+import axios from 'axios';
 import Head from 'next/head'
+import { useEffect, useState } from 'react';
+import { Navigation } from '../components/Navigation';
 
 
 export default function Home() {
+    const [searchInput, setSearchInput] = useState('');
+    const [Search, setSearch] = useState('apple');
+    const [Data, setData] = useState<any>(null);
+
+    useEffect(() => {
+        axios.get(`https://newsapi.org/v2/everything?q=${Search}&from=2023-01-26&to=2023-01-26&sortBy=popularity&apiKey=${process.env.NEXT_PUBLIC_API_KEY}`)
+        .then((response: any) => {
+            console.log(response);
+            setData(response);
+        }).catch((error) => {
+            runner(error);
+        })
+    }, [Search]);
+
+    const CardList = Data?.data.articles.map((items:any) => {
+        return (
+            <Grid.Col span={4}>
+                <Cards img={items.urlToImage} author={ items.author } title={ items.author } desc={ items.description } time={ items.publishedAt } link={ items.url }/>
+            </Grid.Col>
+        );
+    })
+
     return (
         <>
             <Head>
@@ -10,9 +39,21 @@ export default function Home() {
                 <meta name="viewport" content="width=device-width, initial-scale=1" />
                 <link rel="icon" href="/favicon.ico" />
             </Head>
-            <main>
-                You are logged in!
-            </main>
+            <ProtectedRoute>
+                <Navigation>
+                    <Stack>
+                        <TextInput
+                            placeholder="Search"
+                            value={searchInput}
+                            onChange={(e) => setSearchInput(e.target.value)}
+                        />
+                        <Button onClick={() => setSearch(searchInput)}>Search</Button>
+                        <Grid>
+                            { CardList }
+                        </Grid>
+                    </Stack>
+                </Navigation>
+            </ProtectedRoute>
         </>
     )
 }

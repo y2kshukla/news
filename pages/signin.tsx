@@ -1,8 +1,28 @@
+import { useAuth } from '@/components/authcontextprovider';
+import { runner } from '@/components/error';
+import { success } from '@/components/success';
 import { Box, Button, Center, Checkbox, PasswordInput, Stack, TextInput, Title } from '@mantine/core'
 import { useForm } from '@mantine/form'
 import Head from 'next/head'
+import { useRouter } from 'next/router';
 
 export default function SignIn() {
+    const { signIn } = useAuth();
+    const router = useRouter();
+
+    interface signIntypes {
+        email: string,
+        password: string,
+        termsofservice: boolean,
+    }
+
+    // function runner(e: any) { 
+    //     showNotification({
+    //         title: 'Error Code',
+    //         message: `${e}`,
+    //         color: 'red',
+    //     })
+    // }
 
     const form = useForm({
         initialValues: {
@@ -15,7 +35,19 @@ export default function SignIn() {
             password: (value) => (value.length > 6 ? null : 'Password should be longer than 6 words'),
             termsofservice: (value) => (value == true ? null : 'Agree to work' ),
         }
-    })
+    });
+
+    async function submit(e: signIntypes) {
+        try {
+            await signIn(e.email, e.password);
+            router.push("/dashboard");
+            success(false);
+            console.log(e);
+        } catch (error:any) {
+            console.log(error);
+            runner(error);
+        }
+    }
 
     return (
         <>
@@ -34,9 +66,9 @@ export default function SignIn() {
                     width: `300px`,
                 })}>
                     <Center>
-                        <Title size={`h4`} mb={`sm`}>Sign Up</Title>
+                        <Title size={`h4`} mb={`sm`}>Sign In</Title>
                     </Center>
-                    <form onSubmit={form.onSubmit((values) => console.log(values))}>
+                    <form onSubmit={form.onSubmit((values) => submit(values))}>
                         <Stack spacing={`sm`}>
                             <TextInput
                                 withAsterisk
@@ -54,7 +86,7 @@ export default function SignIn() {
                                 label="I agree to work till the end"
                                 {...form.getInputProps('termsofservice', { type: 'checkbox' })}
                             />
-                            <Button type="submit">Submit</Button>
+                            <Button type="submit">Sign In</Button>
                         </Stack>
                     </form>
                 </Box>

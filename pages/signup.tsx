@@ -1,8 +1,20 @@
+import { useAuth } from '@/components/authcontextprovider';
+import { runner } from '@/components/error';
+import { success } from '@/components/success';
 import { Box, Button, Center, Checkbox, Container, createStyles, PasswordInput, Stack, TextInput, Title } from '@mantine/core'
 import { useForm } from '@mantine/form'
 import Head from 'next/head'
+import { useRouter } from 'next/router';
 
 export default function SignUp() {
+    const { signUp } = useAuth();
+    const router = useRouter();
+
+    interface signUptypes {
+        email: string,
+        password: string,
+        termsofservice: boolean,
+    }
 
     const form = useForm({
         initialValues: {
@@ -16,6 +28,18 @@ export default function SignUp() {
             termsofservice: (value) => (value == true ? null : 'Agree to work' ),
         }
     })
+
+    async function submit(e: signUptypes) {
+        try {
+            await signUp(e.email, e.password);
+            router.push("/dashboard");
+            success(true);
+            console.log(e);
+        } catch (error:any) {
+            console.log(error);
+            runner(error);
+        }
+    }
 
     return (
         <>
@@ -36,7 +60,7 @@ export default function SignUp() {
                     <Center>
                         <Title size={`h4`} mb={`sm`}>Sign Up</Title>
                     </Center>
-                    <form onSubmit={form.onSubmit((values) => console.log(values))}>
+                    <form onSubmit={form.onSubmit((values) => submit(values))}>
                         <Stack spacing={`sm`}>
                             <TextInput
                                 withAsterisk
@@ -54,7 +78,7 @@ export default function SignUp() {
                                 label="I agree to work till the end"
                                 {...form.getInputProps('termsofservice', { type: 'checkbox' })}
                             />
-                            <Button type="submit">Submit</Button>
+                            <Button type="submit">Sign Up</Button>
                         </Stack>
                     </form>
                 </Box>
