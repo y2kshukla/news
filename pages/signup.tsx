@@ -1,9 +1,10 @@
 import { useAuth } from '@/components/authcontextprovider';
 import { runner } from '@/components/error';
 import { success } from '@/components/success';
-import { Box, Button, Center, Checkbox, Container, createStyles, PasswordInput, Stack, TextInput, Title } from '@mantine/core'
+import { Anchor, Box, Button, Center, Checkbox, Container, createStyles, PasswordInput, Stack, TextInput, Title } from '@mantine/core'
 import { useForm } from '@mantine/form'
 import Head from 'next/head'
+import Link from 'next/link';
 import { useRouter } from 'next/router';
 
 export default function SignUp() {
@@ -79,6 +80,11 @@ export default function SignUp() {
                                 {...form.getInputProps('termsofservice', { type: 'checkbox' })}
                             />
                             <Button type="submit">Sign Up</Button>
+                            <Center>
+                                <Link href={`/signin`}>
+                                    <Anchor size={`xs`}>Already Signed Up? Log In</Anchor>
+                                </Link>
+                            </Center>
                         </Stack>
                     </form>
                 </Box>

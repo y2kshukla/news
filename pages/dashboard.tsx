@@ -1,33 +1,55 @@
 import Cards from '@/components/card';
 import { runner } from '@/components/error';
 import ProtectedRoute from '@/components/protected';
-import { Button, Grid, Group, Stack, TextInput } from '@mantine/core';
+import { Button, Grid, Group, SimpleGrid, Stack, Text, TextInput } from '@mantine/core';
 import axios from 'axios';
 import Head from 'next/head'
 import { useEffect, useState } from 'react';
 import { Navigation } from '../components/Navigation';
-
+import { useDidUpdate, useIntersection, useMediaQuery, useSetState } from '@mantine/hooks';
+import { useAuth } from '@/components/authcontextprovider';
 
 export default function Home() {
-    const [searchInput, setSearchInput] = useState('');
-    const [Search, setSearch] = useState('apple');
+    const { user } = useAuth();
+
+    const { ref, entry } = useIntersection({
+        threshold: 1,
+    });
+
+    const [SearchData, setSearchData] = useSetState({
+        query: 'apple',
+        input: '',
+        pageSize: 20,
+    });
+
     const [Data, setData] = useState<any>(null);
 
+    const tablet = useMediaQuery('(max-width: 768px)');
+    const phone = useMediaQuery('(max-width: 425px)');
+
+    useDidUpdate(() => {
+        if(entry?.isIntersecting) {
+            if( SearchData.pageSize <= 100 ) {
+                setSearchData({ pageSize: SearchData.pageSize + 20 });
+            }
+        }
+    },  [entry]);
+
     useEffect(() => {
-        axios.get(`https://newsapi.org/v2/everything?q=${Search}&from=2023-01-26&to=2023-01-26&sortBy=popularity&apiKey=${process.env.NEXT_PUBLIC_API_KEY}`)
+        axios.get(`https://newsapi.org/v2/everything?q=${SearchData.query}&pageSize=${SearchData.pageSize}&from=2023-01-26&to=2023-01-26&sortBy=popularity&apiKey=${process.env.NEXT_PUBLIC_API_KEY}`)
         .then((response: any) => {
             console.log(response);
             setData(response);
         }).catch((error) => {
             runner(error);
         })
-    }, [Search]);
+    }, [SearchData.query, SearchData.pageSize]);
 
-    const CardList = Data?.data.articles.map((items:any) => {
+    const CardList = Data?.data.articles.map((items:any, index:number) => {
         return (
-            <Grid.Col span={4}>
+            <div key={index}>
                 <Cards img={items.urlToImage} author={ items.author } title={ items.author } desc={ items.description } time={ items.publishedAt } link={ items.url }/>
-            </Grid.Col>
+            </div>
         );
     })
 
@@ -42,15 +64,17 @@ export default function Home() {
             <ProtectedRoute>
                 <Navigation>
                     <Stack>
+                        <Text>{ tablet && user.email }</Text>
                         <TextInput
                             placeholder="Search"
-                            value={searchInput}
-                            onChange={(e) => setSearchInput(e.target.value)}
+                            value={SearchData.input}
+                            onChange={(e) => setSearchData({ input: e.target.value})}
                         />
-                        <Button onClick={() => setSearch(searchInput)}>Search</Button>
-                        <Grid>
+                        <Button onClick={() => setSearchData({ query: SearchData.input})}>Search</Button>
+                        <SimpleGrid cols={ tablet ? ( phone ? 1 : 2 ) : 3 } spacing={`sm`}>
                             { CardList }
-                        </Grid>
+                        </SimpleGrid>
+                        <Text ref={ref}>{SearchData.pageSize <= 100 ? 'Loading...' : 'No more data to show'}</Text>
                     </Stack>
                 </Navigation>
             </ProtectedRoute>

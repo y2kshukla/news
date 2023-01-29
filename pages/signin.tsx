@@ -1,9 +1,10 @@
 import { useAuth } from '@/components/authcontextprovider';
 import { runner } from '@/components/error';
 import { success } from '@/components/success';
-import { Box, Button, Center, Checkbox, PasswordInput, Stack, TextInput, Title } from '@mantine/core'
+import { Anchor, Box, Button, Center, Checkbox, PasswordInput, Stack, TextInput, Title } from '@mantine/core'
 import { useForm } from '@mantine/form'
 import Head from 'next/head'
+import Link from 'next/link';
 import { useRouter } from 'next/router';
 
 export default function SignIn() {
@@ -13,7 +14,6 @@ export default function SignIn() {
     interface signIntypes {
         email: string,
         password: string,
-        termsofservice: boolean,
     }
 
     // function runner(e: any) { 
@@ -28,12 +28,10 @@ export default function SignIn() {
         initialValues: {
             email: '',
             password: '',
-            termsofservice: false,
         },
         validate: {
             email: (value) => (/^\S+@\S+$/.test(value) ? null : 'Invalid email'),
             password: (value) => (value.length > 6 ? null : 'Password should be longer than 6 words'),
-            termsofservice: (value) => (value == true ? null : 'Agree to work' ),
         }
     });
 
@@ -82,11 +80,13 @@ export default function SignIn() {
                                 withAsterisk
                                 {...form.getInputProps('password')}
                             />
-                            <Checkbox
-                                label="I agree to work till the end"
-                                {...form.getInputProps('termsofservice', { type: 'checkbox' })}
-                            />
+
                             <Button type="submit">Sign In</Button>
+                            <Center>
+                                <Link href={`/signup`}>
+                                    <Anchor size={`xs`}>Don't have a account? Sign Up</Anchor>
+                                </Link>
+                            </Center>
                         </Stack>
                     </form>
                 </Box>

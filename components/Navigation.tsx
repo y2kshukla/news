@@ -1,4 +1,5 @@
 import { AppShell, Navbar, Header, Group, Text, Avatar, Space, ActionIcon, Button } from '@mantine/core';
+import { useMediaQuery } from '@mantine/hooks';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useAuth } from './authcontextprovider';
@@ -9,6 +10,8 @@ export function Navigation({children}: {
 }) {
     const { user, logOut } = useAuth();
     const router = useRouter();
+
+    const tablet = useMediaQuery('(max-width: 768px)');
 
     const handleLogout = async () => {
         try {
@@ -26,20 +29,18 @@ export function Navigation({children}: {
             // navbar={<Navbar width={{ base: 300 }} height={500} p="xs">{/* Navbar content */}</Navbar>}
             header={
                 <Header height={{ base: 50, md: 70 }} p="md">
-                    {/* <div style={{ display: 'flex', alignItems: 'center', height: '100%' }}> */}
-                        <div style={{ display: 'flex', alignItems: 'center', height: '100%' }}>
-                            <Group position={`apart`} w={`100%`}>
-                                <Group>
-                                    <Avatar size={`md`} radius={`xl`} color={`teal`}>D</Avatar>
-                                    <Text weight={`bold`}>Application Name</Text>
-                                </Group>
-                                <Group>
-                                    <Text>{ user.email }</Text>
-                                    <Button variant={`subtle`} onClick={handleLogout}>Log out</Button>
-                                </Group>
+                    <div style={{ display: 'flex', alignItems: 'center', height: '100%' }}>
+                        <Group position={`apart`} w={`100%`}>
+                            <Group>
+                                <Avatar size={`md`} radius={`xl`} color={`teal`}>D</Avatar>
+                                <Text weight={`bold`}>Application Name</Text>
                             </Group>
-                        </div>
-                    {/* </div> */}
+                            <Group>
+                                <Text>{!tablet && user.email  }</Text>
+                                <Button variant={`subtle`} onClick={handleLogout}>Log out</Button>
+                            </Group>
+                        </Group>
+                    </div>
                 </Header>
             }
             styles={(theme) => ({
