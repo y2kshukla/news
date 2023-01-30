@@ -70,7 +70,9 @@ export default function Home() {
                             value={SearchData.input}
                             onChange={(e) => setSearchData({ input: e.target.value})}
                         />
-                        <Button onClick={() => setSearchData({ query: SearchData.input})}>Search</Button>
+                        <Button onClick={() => {
+                            setSearchData({ query: SearchData.input, pageSize: 20})
+                        }}>Search</Button>
                         <SimpleGrid cols={ tablet ? ( phone ? 1 : 2 ) : 3 } spacing={`sm`}>
                             { CardList }
                         </SimpleGrid>
@@ -79,5 +81,5 @@ export default function Home() {
                 </Navigation>
             </ProtectedRoute>
         </>
-    )
+    );
 }
