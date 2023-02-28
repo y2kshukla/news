@@ -84,7 +84,7 @@ export default function SignIn() {
                             <Button type="submit">Sign In</Button>
                             <Center>
                                 <Link href={`/signup`}>
-                                    <Anchor size={`xs`}>Don't have a account? Sign Up</Anchor>
+                                    <Anchor size={`xs`}>Don&apos;t have a account? Sign Up</Anchor>
                                 </Link>
                             </Center>
                         </Stack>
